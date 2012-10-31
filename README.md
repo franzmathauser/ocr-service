@@ -16,3 +16,8 @@ You have to have "deu"-language installed in tesseract (installation-process)
 
 You may edit the proxy configuration in File: ocr-server.js
 
+Run
+===
+
+node ocr-server.js
+
