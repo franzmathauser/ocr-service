@@ -1,5 +1,5 @@
 /*
- * Project:  for Masterthesis
+ * Project: Masterthesis
  * OCR-Service for simple bank transfer text extraction
  *
  * Author:  Franz Mathauser
