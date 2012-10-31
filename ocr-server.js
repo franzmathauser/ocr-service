@@ -1,9 +1,17 @@
+/*
+ * Project:  for Masterthesis
+ * OCR-Service for simple bank transfer text extraction
+ *
+ * Author:  Franz Mathauser
+ * Last Change: 2012-10-31
+ * Copyright (c): Franz Mathauser, 2012
+ */
+
 var nodecr = require('nodecr'),
 url = require('url'),
 http = require('http'),
 fs = require('fs'),
 tmp = require('tmp');
-
 
 
 http.createServer(function(req,res){
