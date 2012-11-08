@@ -3,6 +3,7 @@ Installation
 
 npm install nodecr
 npm install tmp
+npm install multipart
 
 Configuration
 =============
