@@ -1,3 +1,11 @@
+/*###########################################
+ #       M A S T E R T H E S I S            #
+ #                                          #
+ # Franz Mathauser                          #
+ # Hochschule München                       #
+ #                                          #
+ ##########################################*/
+
 /**
 * Define Variables
 **/
