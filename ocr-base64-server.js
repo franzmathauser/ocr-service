@@ -1,3 +1,6 @@
+/**
+* Define Variables
+**/
 var formidable = require('formidable'),
     http = require('http'),
     sys = require('sys'),
@@ -5,40 +8,45 @@ var formidable = require('formidable'),
     nodecr = require('nodecr'), 
     fs = require('fs');
 
+/**
+* Header configuration for Cross-Origin Policy.
+**/
 var headers = {};
-      // IE8 does not allow domains to be specified, just the *
-      // headers["Access-Control-Allow-Origin"] = req.headers.origin;
-      headers["Access-Control-Allow-Origin"] = "*";
-      headers["Access-Control-Allow-Methods"] = "POST, GET, PUT, DELETE, OPTIONS";
-      headers["Access-Control-Allow-Credentials"] = false;
-      headers["Access-Control-Max-Age"] = '86400'; // 24 hours
-      headers["Access-Control-Allow-Headers"] = "X-Requested-With, X-HTTP-Method-Override, Content-Type, Accept";
-      headers["Content-Type"] = "text/html";
-      headers["charset"] = "utf-8"
+    headers["Access-Control-Allow-Origin"] = "*";
+    headers["Access-Control-Allow-Methods"] = "POST, GET, PUT, DELETE, OPTIONS";
+    headers["Access-Control-Allow-Credentials"] = false;
+    headers["Access-Control-Max-Age"] = '86400'; // 24 hours
+    headers["Access-Control-Allow-Headers"] = "X-Requested-With, X-HTTP-Method-Override, Content-Type, Accept";
+    headers["Content-Type"] = "text/html";
+    headers["charset"] = "utf-8"
 
+/**
+* Setup Server
+**/
 http.createServer(function(req, res) {
-      
-if (req.url == '/base64upload' && req.method.toLowerCase() == 'post') {
+  
+  // respond to the /base64upload ressourcce request
+  if (req.url == '/base64upload' && req.method.toLowerCase() == 'post') {
     var form = new formidable.IncomingForm();
     form.parse(req, function(err, fields, files) {
-      //console.log(fields.image);
 
-      tmp.tmpName(function(err, output) {
-        console.log(output);
+      // create temp-file
+      tmp.tmpName(function(err, tmpFile) {
+        console.log(tmpFile);
+        // extract meta-data from base64-encoded file.
         var base64Data = fields.image.replace(/^data:image\/png;base64,/,"");
-
-        fs.writeFile(output, base64Data, 'base64', function(err) {
-          //callback 
-          doOCR(output, res);
+        //write file to disc.
+        fs.writeFile(tmpFile, base64Data, 'base64', function(err) {
+          doBankFormOCR(tmpFile, res);
         });
 
       });
-      
+
     })
     return;
   }
 
-  // show a file upload form
+  // default response
   res.writeHead(200, headers);
   res.end('no base64 file found');
 
@@ -46,22 +54,21 @@ if (req.url == '/base64upload' && req.method.toLowerCase() == 'post') {
 console.log('listen on port 8888');
 
 
-
-function doOCR(filePath, res) {
+/**
+* doBankFormOCR provides a simple method the ocr-decode a image. 
+* This method calls the tesseract-ocr-engine and returns the read information as json.
+**/
+function doBankFormOCR(filePath, res) {
 
   console.log(filePath);
   
     // do ocr processing using tesseract
     nodecr.process(filePath,function(err, text) {
 
-      // write HTTP-Response
       if(err) {
           res.writeHead(500,headers);
-          //console.error("500");
           res.end('A Error occured during OCR-Process.');
       } else {
-
-        res.writeHead(200,headers);
 
         //parse string on newlines.
         var textArray = []; 
@@ -96,12 +103,13 @@ function doOCR(filePath, res) {
         console.log(responseBodyObj);
 
         //return response object as json
+        res.writeHead(200,headers);
         res.end(JSON.stringify(responseBodyObj));
 
       }
 
       console.log("ocr-server: Deleting '"+filePath+"'");
-      fs.unlink(filePath, function (err) {
+      fs.unlink(filePath, function (err) { // delete temp-file
           // ignore any errors here as it just means we have a temporary file left somewehere
       });
 
